@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bobo.html</title>
+    <link rel="icon" href="bobo/favicon3.webp" type="image/webp">
+
+    <style>
+       
+        * {
+            box-sizing: border-box;
+        }
+
+        body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    
+    min-height: 100%; 
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ffe9f0 0%, #ffffff 100%);
+    
+    
+    display: flex;
+    flex-direction: column; 
+    align-items: center;   
+    justify-content: flex-start; 
+    color: #555;
+    overflow-x: hidden; 
+}
+
+       
+        .top-bar {
+            background-color: #ff9fb2; 
+            width: 100%; 
+            height: 70px; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .back-link {
+            text-decoration: none; 
+            color: white; 
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+        }
+
+        .container {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 15px 35px rgba(255, 182, 193, 0.3);
+    max-width: 800px;
+    width: 90%;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin-top: 120px; 
+    margin-bottom: 50px;
+    flex-shrink: 0;
+}
+
+        
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+
+        .name-title {
+            font-size: 4rem;
+            font-weight: 200;
+            color: #ff9fb2;
+            letter-spacing: 5px;
+            margin: 0;
+        }
+
+        .welcome-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            color: #888;
+            border: 1px solid #ffe4e1;
+            font-size: 1rem;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #ffb6c1, transparent);
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .divider::after {
+            content: '✿';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff5f8;
+            padding: 0 10px;
+            color: #ffb6c1;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            background-color: white;
+            color: #ff9fb2;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            background-color: #ff9fb2;
+            color: white;
+        }
+
+        #content-display {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 25px;
+            border: 2px solid #fff0f5;
+            color: #666;
+            line-height: 1.6;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glider {
+            transform-origin: center bottom;
+            animation: sway 3s ease-in-out infinite;
+        }
+        @keyframes sway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        .eye-pupil {
+            animation: blink 4s infinite;
+            transform-origin: center;
+        }
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+        .ear-left {
+            transform-origin: 60px 60px;
+            animation: twitch-l 2s infinite;
+        }
+        .ear-right {
+            transform-origin: 140px 60px;
+            animation: twitch-r 2s infinite;
+        }
+        @keyframes twitch-l {
+            0%, 80%, 100% { transform: rotate(0deg); }
+            90% { transform: rotate(-10deg); }
+        }
+        @keyframes twitch-r {
+            0%, 70%, 100% { transform: rotate(0deg); }
+            85% { transform: rotate(10deg); }
+        }
+
+
+
+
+       
+
+.figure-section {
+    margin: 80px auto 40px auto; 
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    border-radius: 30px;
+    border: 2px dashed #ffb6c1; 
+    max-width: 400px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(255, 182, 193, 0.2);
+}
+
+.figure-img {
+    width: 250px; 
+    height: auto;
+    border-radius: 15px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.figure-img:hover {
+    transform: scale(1.1) rotate(-3deg);
+}
+
+.figure-desc {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #ff9fb2;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    letter-spacing: 1px;
+}
+
+#image-overlay {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(255, 220, 220, 0.8); 
+    z-index: 2000; 
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+    animation: fadeIn 0.3s ease;
+}
+
+
+#enlarged-img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(255, 213, 213, 0.404);
+    transform: scale(0.9);
+    animation: zoomIn 0.3s ease forwards;
+}
+
+
+@keyframes zoomIn {
+    to { transform: scale(1); }
+}
+
+
+.figure-img {
+    cursor: zoom-in;
+}
+
+
+
+
+
+  /* Styling the floating button */    
+  .floating-btn {      
+    position: fixed;         /* Keeps the button in a fixed position on the screen */      
+    bottom: 30px;           /* 30px distance from the bottom */      
+    right: 30px;            /* 30px distance from the right */      
+    width: 60px;            /* Width of the circle */      
+    height: 60px;           /* Height of the circle */      
+    background-color: #ffcace; /* Button color (Blue) */      
+    color: white;           /* Icon or text color */      
+    border-radius: 50%;     /* Makes the button perfectly round */      
+    display: flex;          /* Centers the content inside */      
+    align-items: center;      
+    justify-content: center;      
+    text-decoration: none;  /* Removes underline if using an <a> tag */      
+    font-size: 24px;        /* Size of the icon or text */      
+    font-weight: bold;      
+    box-shadow: 0 4px 8px rgba(255, 199, 199, 0.781); /* Adds a subtle shadow */      
+    z-index: 1000;          /* Ensures it stays on top of other elements */      
+    transition: all 0.3s ease; /* Smooth hover effect */    }    /* Hover effect */    
+    
+    .floating-btn:hover {      
+        background-color: #ffbbc4; /* Darker blue on hover */      
+        transform: scale(1.1);    /* Slightly enlarges the button */      
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);    } 
+
+        
+
+
+
+
+
+
+
+
+    /* 播放栏主体 */
+.music-player-bar {
+    position: fixed;
+    bottom: 20px; /* 距离底部一点距离，更有悬浮感 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    background: rgba(255, 255, 255, 0.75); /* 半透明白色 */
+    backdrop-filter: blur(15px); /* 毛玻璃模糊核心 */
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 10px 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    z-index: 9999; /* 确保在最上层 */
+}
+
+/* 内容布局 */
+.player-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 左侧信息栏 */
+.song-meta {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.player-album-art {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin-right: 15px;
+}
+
+.song-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.song-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.artist-name {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* 播放器样式微调 */
+.audio-wrapper {
+    flex-grow: 1;
+}
+
+audio {
+    width: 100%;
+    height: 35px; /* 让高度更窄更精致 */
+}
+
+/* 适配手机端 */
+@media (max-width: 600px) {
+    .song-details {
+        display: none; /* 手机端空间不足时隐藏文字 */
+    }
+    .music-player-bar {
+        bottom: 10px;
+        padding: 8px 15px;
+    }
+}
+
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <a href="../index.html" class="back-link">
+            <span style="font-size: 24px;">‹</span> 
+            <span>Back</span>
+        </a>
+    </header>
+
+    <div class="container">
+        <div class="header-section">
+            <div class="animation-box">
+                <svg width="180" height="180" viewBox="0 0 200 200">
+                    <g class="glider">
+                        <circle class="ear-left" cx="60" cy="60" r="25" fill="#A9A9A9" />
+                        <circle class="ear-right" cx="140" cy="60" r="25" fill="#A9A9A9" />
+                        <circle cx="100" cy="110" r="70" fill="#D3D3D3" />
+                        <path d="M100 40 Q100 60 100 80" stroke="#4F4F4F" stroke-width="8" stroke-linecap="round" fill="none" />
+                        <g class="eye-pupil">
+                            <circle cx="65" cy="110" r="18" fill="#1A1A1A" />
+                            <circle cx="135" cy="110" r="18" fill="#1A1A1A" />
+                            <circle cx="70" cy="105" r="5" fill="white" />
+                            <circle cx="140" cy="105" r="5" fill="white" />
+                        </g>
+                        <circle cx="100" cy="130" r="6" fill="#FFB6C1" />
+                        <path d="M90 145 Q100 155 110 145" stroke="#4F4F4F" stroke-width="2" fill="none" />
+                    </g>
+                </svg>
+            </div>
+            <h1 class="name-title">Bobo</h1>
+        </div>
+
+        <div class="welcome-box">
+            Welcome to Bobo's webpage!<br>
+            Here are some things about me. <br>
+            Click the buttons below to see more.
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="button-group">
+            <button class="btn" onclick="show(1)">About me</button>
+            <button class="btn" onclick="show(2)">Daily Log</button>
+            <button class="btn" onclick="show(3)">Wish List</button>
+        </div>
+
+        <div id="content-display"></div>
+    </div>
+
+
+
+
+
+    <script>
+        const info = {
+            1: "Art is my best elective subject. I love drawing with acrylics, watercolors, and colored pencils. I feel like I need to practice more because my drawings are not perfect yet. :(",
+            2: "I am an introvert. I usually only talk to people at school and stay quiet at home. I love staying in my room with the AC on in summer, relaxing with books or my phone. It makes me feel very comfortable and not anxious. :)))",
+            3: "I want to keep drawing and never give up. I hope to be more self-disciplined and stay in a good mood. I also want to learn how to do nail art and find more things I like to do... ✨"
+        };
+
+        function show(id) {
+            const box = document.getElementById('content-display');
+            box.style.display = 'block';
+            box.innerText = info[id];
+        }
+
+
+
+        
+function openImage(src) {
+    const overlay = document.getElementById('image-overlay');
+    const fullImg = document.getElementById('enlarged-img');
+    overlay.style.display = 'flex';
+    fullImg.src = src;
+    document.body.style.overflow = 'hidden'; 
+}
+
+
+function closeImage() {
+    const overlay = document.getElementById('image-overlay');
+    overlay.style.display = 'none';
+    document.body.style.overflow = 'auto'; 
+}
+        
+        
+    </script>
+
+
+
+
+
+<div class="figure-section">
+   
+    <img src="bobo/gemini.png" 
+         class="figure-img" 
+         onclick="openImage(this.src)">
+    <p class="figure-desc">
+        Check out this adorable collectible figure generated with the help of Gemini... ^^!!
+    </p>
+</div>
+
+
+
+
+
+<div id="image-overlay" onclick="closeImage()">
+    <img id="enlarged-img" src="" alt="Enlarged View">
+</div>
+
+
+
+
+<!-- 音乐播放栏容器 -->
+<div class="music-player-bar">
+    <div class="player-content">
+        <!-- 左侧：封面与信息 -->
+        <div class="song-meta">
+            <img src="bobo/Goodluckbabe.webp" alt="dahlia" class="player-album-art">
+            <div class="song-details">
+                <span class="song-title">Good Luck, Babe!</span>
+                <span class="artist-name">Chappell Roan</span>
+            </div>
+        </div>
+
+        <!-- 右侧：原生播放器 -->
+        <div class="audio-wrapper">
+            <audio controls>
+                <source src="bobo/chappell roan - good Luck Babe.mp3" type="audio/mp3">
+                
+            </audio>
+            
+        </div>
+
+
+
+<a href="../index.html" class="floating-btn">Back</a>
+
+</body>
+</html>
