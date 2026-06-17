@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hide and Seek</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            overscroll-behavior: none;
+        }
+        /* 滚动条自定义样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #45475a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #585b70;
+        }
+        /* 点击粒子特效 */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: blow-out 0.8s ease-out forwards;
+        }
+        @keyframes blow-out {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tw-tx), var(--tw-ty)) scale(1.2) rotate(var(--tw-tr));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#11111b] text-[#cdd6f4] h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- 飘字通知系统 -->
+    <div id="toast-notif" class="pointer-events-none fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1e2e]/95 border border-[#45475a] px-6 py-3 rounded-full text-sm font-semibold shadow-2xl opacity-0 transition-opacity duration-300 flex items-center gap-3">
+        <span id="toast-icon">✨</span>
+        <span id="toast-text" class="text-white"></span>
+    </div>
+
+    <!-- 游戏结算弹窗 (代替浏览器的默认 alert) -->
+    <div id="game-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-[#1e1e2e] border border-[#45475a] max-w-md w-full rounded-2xl p-6 text-center shadow-2xl">
+            <div id="modal-icon" class="text-6xl mb-4">🏆</div>
+            <h2 id="modal-title" class="text-2xl font-extrabold mb-2 text-white">Congratulations!</h2>
+            <p id="modal-desc" class="text-[#a6adc8] mb-6">You found all items!</p>
+            <button id="modal-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg active:scale-95">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <!-- 游戏主菜单页面 -->
+    <div id="home-screen" class="flex-1 flex flex-col justify-center items-center p-6 relative overflow-hidden bg-[radial-gradient(#313244_1px,transparent_1px)] [background-size:20px_20px]">
+        
+        <!-- 漂浮返回个人主站按钮 -->
+        <a id="back-to-hub-btn" href="https://your-website.com" class="absolute top-6 left-6 z-40 bg-[#1e1e2e]/90 hover:bg-[#313244] border border-[#45475a] text-white px-4 py-2.5 rounded-xl flex items-center gap-2 text-xs font-extrabold shadow-lg transition transform active:scale-95 duration-150">
+            <i class="fa-solid fa-arrow-left text-indigo-400"></i>
+            <span>Back to Website</span>
+        </a>
+
+        <div class="max-w-md w-full text-center space-y-6 bg-[#1e1e2e]/90 p-8 rounded-3xl border border-[#313244] backdrop-blur-lg shadow-2xl relative z-10">
+            
+            <!-- 经典的像素小熊 Mascot -->
+            <div class="flex justify-center mb-2 animate-bounce" style="animation-duration: 3s;">
+                <svg viewBox="0 0 16 16" width="128" height="128" class="drop-shadow-lg" style="image-rendering: pixelated;">
+                    <!-- Ears -->
+                    <rect x="2" y="2" width="3" height="3" fill="#b15e39"/>
+                    <rect x="3" y="3" width="1" height="1" fill="#f5c2e7"/>
+                    <rect x="11" y="2" width="3" height="3" fill="#b15e39"/>
+                    <rect x="12" y="3" width="1" height="1" fill="#f5c2e7"/>
+                    <!-- Head -->
+                    <rect x="4" y="3" width="8" height="7" fill="#c77d58"/>
+                    <rect x="3" y="4" width="10" height="5" fill="#c77d58"/>
+                    <!-- Eyes -->
+                    <rect x="5" y="5" width="1" height="1" fill="#11111b"/>
+                    <rect x="10" y="5" width="1" height="1" fill="#11111b"/>
+                    <!-- Snout & Nose -->
+                    <rect x="7" y="6" width="2" height="2" fill="#f9e2af"/>
+                    <rect x="7" y="6" width="2" height="1" fill="#11111b"/>
+                    <rect x="7" y="7" width="2" height="1" fill="#c77d58"/>
+                    <!-- Body -->
+                    <rect x="4" y="9" width="8" height="6" fill="#c77d58"/>
+                    <rect x="3" y="10" width="10" height="4" fill="#c77d58"/>
+                    <rect x="5" y="10" width="6" height="4" fill="#b15e39"/>
+                    <!-- Arms -->
+                    <rect x="2" y="10" width="2" height="3" fill="#c77d58"/>
+                    <rect x="12" y="10" width="2" height="3" fill="#c77d58"/>
+                    <!-- Feet -->
+                    <rect x="3" y="14" width="3" height="1" fill="#b15e39"/>
+                    <rect x="10" y="14" width="3" height="1" fill="#b15e39"/>
+                </svg>
+            </div>
+
+            <!-- 主页文字标题 -->
+            <div class="space-y-2">
+                <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full text-xs font-bold tracking-widest uppercase">CLASSROOM HUNT</span>
+                <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 select-none">
+                    Hide and Seek
+                </h1>
+                <p class="text-[#a6adc8] text-sm leading-relaxed">
+                    Search and find all 30 hidden objects in the classroom! Drag the map to explore, and scroll to zoom in closely on hidden corners.
+                </p>
+            </div>
+
+            <!-- 历史个人最佳成绩显示区 -->
+            <div id="best-time-container" class="hidden text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 mx-auto w-fit">
+                <span>👑 Personal Best: <span id="best-time-display">00:00</span></span>
+            </div>
+
+            <!-- 开始游戏按钮 -->
+            <div class="pt-2">
+                <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-extrabold text-lg rounded-2xl shadow-lg transition transform active:scale-95 duration-150">
+                    <i class="fa-solid fa-play mr-2"></i> START SEARCHING
+                </button>
+            </div>
+
+            <!-- 底部提示信息 -->
+            <div class="pt-4 border-t border-[#313244] text-xs text-[#6c7086] flex justify-center gap-6">
+                <span><i class="fa-solid fa-arrows-to-eye mr-1"></i> Drag to Pan Map</span>
+                <span><i class="fa-solid fa-magnifying-glass mr-1"></i> Zoom In/Out</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 核心游戏对局画面 -->
+    <div id="gameplay-screen" class="hidden flex-1 flex flex-col md:flex-row relative overflow-hidden bg-[#181825]">
+        
+        <!-- 左侧状态控制面板 -->
+        <div id="sidebar" class="w-full md:w-80 bg-[#11111b] border-b md:border-b-0 md:border-r border-[#313244] flex flex-col relative z-20 shrink-0">
+            <!-- 头部返回与计数器 -->
+            <div class="p-4 border-b border-[#313244] flex items-center justify-between">
+                <button onclick="quitToMainMenu()" class="text-[#a6adc8] hover:text-white px-3 py-1.5 bg-[#252538] rounded-lg text-xs font-medium flex items-center gap-2 hover:bg-[#313245] transition">
+                    <i class="fa-solid fa-arrow-left"></i> Menu
+                </button>
+                <div class="text-right">
+                    <span id="progress-text" class="text-xs font-bold text-white">0 / 30 Found</span>
+                </div>
+            </div>
+
+            <!-- 计时器面板 -->
+            <div class="p-4 bg-[#181825] border-b border-[#313244] flex items-center justify-between">
+                <div class="flex items-center gap-2 text-xs text-[#a6adc8]">
+                    <i class="fa-solid fa-clock text-[#f38ba8]"></i>
+                    <span>Time Elapsed:</span>
+                </div>
+                <div id="game-timer" class="text-sm font-bold font-mono text-white">00:00</div>
+            </div>
+
+            <!-- 操作提示条 -->
+            <div class="mx-4 mt-3 p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-xl flex gap-2 items-start text-xs text-indigo-200">
+                <span class="text-base">💡</span>
+                <p>Drag the screen to move around. Use your mouse scroll or pinch gestures to zoom into shelves, desk corners, and open lockers!</p>
+            </div>
+
+            <!-- 目标列表 (动态加载) -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-2">
+                <h4 class="text-xs font-bold text-[#585b70] uppercase tracking-wider mb-1">Items to Find:</h4>
+                <div id="targets-list" class="grid grid-cols-2 md:grid-cols-1 gap-1.5">
+                    <!-- Loaded dynamically via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏主画布观察窗口 -->
+        <div class="flex-1 relative overflow-hidden bg-[#181825]" id="viewport-container" style="cursor: grab;">
+            
+            <!-- 地图缩放控制按钮 -->
+            <div class="absolute bottom-6 right-6 z-30 flex flex-col gap-2">
+                <button onclick="adjustZoom(0.2)" class="w-10 h-10 bg-[#1e1e2e]/90 text-white border border-[#45475a] rounded-xl hover:bg-[#313244] flex items-center justify-center text-base active:scale-90 shadow-xl transition">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button onclick="adjustZoom(-0.2)" class="w-10 h-10 bg-[#1e1e2e]/90 text-white border border-[#45475a] rounded-xl hover:bg-[#313244] flex items-center justify-center text-base active:scale-90 shadow-xl transition">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button onclick="resetZoomAndCenter()" class="w-10 h-10 bg-[#1e1e2e]/90 text-white border border-[#45475a] rounded-xl hover:bg-[#313244] flex items-center justify-center text-xs active:scale-90 shadow-xl transition">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+
+            <!-- 地图缩放与平移的实际容器 -->
+            <div id="game-world" class="absolute origin-top-left select-none" style="width: 1200px; height: 800px; transform: translate(0px, 0px) scale(1);">
+                <svg viewBox="0 0 1200 800" width="1200" height="800" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <!-- 渐变和图案定义 -->
+                    <defs>
+                        <!-- 地板网格图案 -->
+                        <pattern id="gridPattern" width="30" height="30" patternUnits="userSpaceOnUse">
+                            <rect width="30" height="30" fill="#1e1e2e" />
+                            <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#2a2b3d" stroke-width="1"/>
+                        </pattern>
+                        <!-- 地毯径向渐变 -->
+                        <radialGradient id="carpetGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#b85c5c" />
+                            <stop offset="100%" stop-color="#8c3b3b" />
+                        </radialGradient>
+                    </defs>
+
+                    <!-- 底层地板背景 -->
+                    <rect width="1200" height="800" fill="url(#gridPattern)" />
+
+                    <!-- 墙面分割底板线 -->
+                    <rect x="0" y="550" width="1200" height="250" fill="#181825" />
+                    <line x1="0" y1="550" x2="1200" y2="550" stroke="#313244" stroke-width="6" />
+
+                    <!-- 标志性黑板 -->
+                    <rect x="350" y="80" width="500" height="220" fill="#11111b" rx="15" stroke="#45475a" stroke-width="12" />
+                    <text x="600" y="160" fill="#a6e3a1" font-size="28" font-family="'Plus Jakarta Sans', sans-serif" font-weight="bold" text-anchor="middle">Classroom Hunt</text>
+                    <text x="600" y="215" fill="#89b4fa" font-size="14" font-family="'Plus Jakarta Sans', sans-serif" text-anchor="middle" opacity="0.8">Find all 30 hidden items in the room!</text>
+
+                    <!-- 大红圆形地毯 -->
+                    <ellipse cx="600" cy="690" rx="280" ry="80" fill="url(#carpetGrad)" stroke="#fab387" stroke-width="4" stroke-dasharray="8,6" />
+
+                    <!-- 左侧绿色盆栽 -->
+                    <path d="M 220 540 Q 200 480 240 450 Q 280 480 260 540 Z" fill="#2e7d32" />
+                    <path d="M 230 540 Q 210 490 250 470 Q 290 490 270 540 Z" fill="#388e3c" opacity="0.8" />
+                    <ellipse cx="245" cy="550" rx="30" ry="12" fill="#585b70" />
+                    <rect x="225" y="550" width="40" height="40" fill="#313244" rx="5" />
+                    
+                    <!-- 右侧绿色盆栽 -->
+                    <path d="M 980 540 Q 960 480 1000 450 Q 1040 480 1020 540 Z" fill="#2e7d32" />
+                    <path d="M 990 540 Q 970 490 1010 470 Q 1050 490 1030 540 Z" fill="#388e3c" opacity="0.8" />
+                    <ellipse cx="1005" cy="550" rx="30" ry="12" fill="#585b70" />
+                    <rect x="985" y="550" width="40" height="40" fill="#313244" rx="5" />
+
+                    <!-- 学生课桌椅 (固定场景陈设) -->
+                    <!-- 课桌 1 (左后) -->
+                    <rect x="340" y="440" width="140" height="60" fill="#252538" rx="8" stroke="#313244" stroke-width="4" />
+                    <rect x="360" y="420" width="100" height="20" fill="#1e1e2e" rx="4" />
+                    <!-- 课桌 2 (右后) -->
+                    <rect x="720" y="440" width="140" height="60" fill="#252538" rx="8" stroke="#313244" stroke-width="4" />
+                    <rect x="740" y="420" width="100" height="20" fill="#1e1e2e" rx="4" />
+                    <!-- 课桌 3 (左前) -->
+                    <rect x="280" y="600" width="160" height="70" fill="#252538" rx="8" stroke="#313244" stroke-width="4" />
+                    <rect x="310" y="580" width="100" height="20" fill="#1e1e2e" rx="4" />
+                    <!-- 课桌 4 (右前) -->
+                    <rect x="760" y="600" width="160" height="70" fill="#252538" rx="8" stroke="#313244" stroke-width="4" />
+                    <rect x="790" y="580" width="100" height="20" fill="#1e1e2e" rx="4" />
+
+                    <!-- 讲台大桌 (带半拉开的抽屉) -->
+                    <rect x="480" y="320" width="240" height="75" fill="#45475a" rx="10" stroke="#585b70" stroke-width="4" />
+
+                    <!-- 1. 左侧大窗户 (带向两侧收起拉开的窗帘) -->
+                    <g transform="translate(80, 80)">
+                        <rect x="0" y="0" width="160" height="240" fill="#89b4fa" rx="8" opacity="0.3" stroke="#45475a" stroke-width="6" />
+                        <line x1="80" y1="0" x2="80" y2="240" stroke="#45475a" stroke-width="4" />
+                        <line x1="0" y1="120" x2="160" y2="120" stroke="#45475a" stroke-width="4" />
+                        <rect x="0" y="0" width="25" height="240" fill="#f38ba8" rx="4" />
+                        <rect x="135" y="0" width="25" height="240" fill="#f38ba8" rx="4" />
+                    </g>
+
+                    <!-- 2. 左下置物架 (常开型储物柜，不加遮盖板) -->
+                    <g transform="translate(70, 420)">
+                        <rect x="0" y="0" width="120" height="300" fill="#313244" rx="10" stroke="#45475a" stroke-width="6" />
+                        <line x1="0" y1="100" x2="120" y2="100" stroke="#45475a" stroke-width="4" />
+                        <line x1="0" y1="200" x2="120" y2="200" stroke="#45475a" stroke-width="4" />
+                    </g>
+
+                    <!-- 3. 右侧木质储物大柜 (常开无遮挡) -->
+                    <g transform="translate(1010, 140)">
+                        <rect x="0" y="0" width="140" height="240" fill="#1e1e2e" rx="10" stroke="#45475a" stroke-width="6" />
+                        <line x1="0" y1="80" x2="140" y2="80" stroke="#45475a" stroke-width="4" />
+                        <line x1="0" y1="160" x2="140" y2="160" stroke="#45475a" stroke-width="4" />
+                    </g>
+
+                    <!-- 4. 讲台外拉式的储物格抽屉 (常开状态) -->
+                    <g transform="translate(530, 360)">
+                        <rect x="0" y="0" width="140" height="40" fill="#11111b" rx="6" stroke="#45475a" stroke-width="3" />
+                        <g transform="translate(0, 35)">
+                            <rect x="4" y="-30" width="132" height="32" fill="#cba6f7" rx="4" />
+                            <rect x="45" y="-20" width="50" height="10" fill="#f9e2af" rx="5" />
+                        </g>
+                    </g>
+
+                    <!-- 5. 右下角木箱 (箱盖歪向一侧露空，内部完全外露) -->
+                    <g transform="translate(970, 630)">
+                        <rect x="0" y="0" width="150" height="100" fill="#45475a" rx="10" stroke="#313244" stroke-width="4" />
+                        <g transform="translate(-30, -25) rotate(-12)">
+                            <rect x="-4" y="-10" width="158" height="35" fill="#a6e3a1" rx="8" stroke="#313244" stroke-width="4" />
+                            <rect x="60" y="10" width="30" height="12" fill="#f9e2af" rx="2" />
+                        </g>
+                    </g>
+
+                    <!-- 寻找目标动态层 -->
+                    <g id="svg-items-layer">
+                        <!-- Instantiated programmatically by javascript execution -->
+                    </g>
+
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ⚙️ 配置：返回你的个人主页网址 (请在这里替换成你的实际网站链接) ---
+        const EXTERNAL_WEBSITE_URL = "https://bobo2111.github.io/Bobo/";
+
+        // 绑定外部跳转按钮链接
+        document.getElementById('back-to-hub-btn').href = EXTERNAL_WEBSITE_URL;
+
+        // --- Web Audio 声音引擎 ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'success') {
+                    osc.type = 'triangle';
+                    const now = audioCtx.currentTime;
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.3);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    const now = audioCtx.currentTime;
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+                    osc.start(now);
+                    osc.stop(now + 0.07);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        // --- 静态 30 个藏匿物项坐标参数表 ---
+        const soloPredefinedItems = [
+            { id: 1, emoji: '📕', name: 'Red Book', x: 370, y: 460, found: false },
+            { id: 2, emoji: '☕', name: 'Coffee Cup', x: 740, y: 460, found: false },
+            { id: 3, emoji: '🍎', name: 'Sweet Apple', x: 600, y: 340, found: false },
+            { id: 4, emoji: '🎲', name: 'Lucky Dice', x: 300, y: 620, found: false },
+            { id: 5, emoji: '🧁', name: 'Tasty Cupcake', x: 800, y: 620, found: false },
+            { id: 6, emoji: '🧭', name: 'Adventure Compass', x: 490, y: 340, found: false },
+            { id: 7, emoji: '🐸', name: 'Green Frog', x: 245, y: 435, found: false }, 
+            { id: 8, emoji: '🐞', name: 'Ladybug', x: 1005, y: 435, found: false },  
+            { id: 9, emoji: '🔔', name: 'School Bell', x: 650, y: 345, found: false },
+            { id: 10, emoji: '🍀', name: 'Lucky Clover', x: 480, y: 690, found: false }, 
+            { id: 11, emoji: '🎈', name: 'Red Balloon', x: 1120, y: 55, found: false }, 
+            { id: 12, emoji: '🕶️', name: 'Sunglasses', x: 440, y: 460, found: false },
+            { id: 13, emoji: '✏️', name: 'Yellow Pencil', x: 820, y: 460, found: false },
+            { id: 14, emoji: '🧃', name: 'Juice Box', x: 380, y: 625, found: false },
+            { id: 15, emoji: '🕸️', name: 'Tiny Spider', x: 450, y: 150, found: false }, 
+
+            // 窗台处
+            { id: 16, emoji: '🧸', name: 'Toy Teddy Bear', x: 110, y: 200, found: false },
+            { id: 17, emoji: '🔑', name: 'Golden Key', x: 210, y: 210, found: false },
+
+            // 左下置物储物架
+            { id: 18, emoji: '⚽', name: 'Soccer Ball', x: 130, y: 465, found: false }, 
+            { id: 19, emoji: '🛹', name: 'Skateboard', x: 130, y: 565, found: false },  
+            { id: 20, emoji: '🎀', name: 'Pink Ribbon', x: 130, y: 665, found: false },
+
+            // 右侧储物架
+            { id: 21, emoji: '🏆', name: 'Gold Trophy', x: 1080, y: 175, found: false },
+            { id: 22, emoji: '🕯️', name: 'Lighted Candle', x: 1050, y: 255, found: false },
+            { id: 23, emoji: '✉️', name: 'Secret Letter', x: 1110, y: 255, found: false },
+            { id: 24, emoji: '🎁', name: 'Gift Box', x: 1080, y: 335, found: false },
+
+            // 讲台小抽屉内
+            { id: 25, emoji: '💎', name: 'Shiny Gem', x: 570, y: 385, found: false },
+            { id: 26, emoji: '🪙', name: 'Silver Coin', x: 630, y: 385, found: false },
+
+            // 箱内物
+            { id: 27, emoji: '🍿', name: 'Popcorn Tub', x: 1010, y: 685, found: false },
+            { id: 28, emoji: '🍌', name: 'Sweet Banana', x: 1080, y: 685, found: false },
+            { id: 29, emoji: '🎮', name: 'Controller', x: 1045, y: 685, found: false },
+            { id: 30, emoji: '🎸', name: 'Mini Guitar', x: 130, y: 260, found: false }
+        ];
+
+        let itemsData = [];
+        let panX = 0;
+        let panY = 0;
+        let scale = 1.0;
+        let isDragging = false;
+        let startX, startY;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let gameFinished = false;
+
+        const viewport = document.getElementById('viewport-container');
+        const gameWorld = document.getElementById('game-world');
+
+        // --- 视图平移与缩放逻辑 ---
+        function updateTransform() {
+            gameWorld.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+
+        function adjustZoom(amount) {
+            playSound('click');
+            const centerViewX = viewport.clientWidth / 2;
+            const centerViewY = viewport.clientHeight / 2;
+            const worldX = (centerViewX - panX) / scale;
+            const worldY = (centerViewY - panY) / scale;
+
+            scale = Math.min(Math.max(scale + amount, 0.45), 2.2);
+            panX = centerViewX - worldX * scale;
+            panY = centerViewY - worldY * scale;
+            keepWithinBounds();
+            updateTransform();
+        }
+
+        function resetZoomAndCenter() {
+            scale = Math.min(viewport.clientWidth / 1200, viewport.clientHeight / 800, 1.0);
+            panX = (viewport.clientWidth - 1200 * scale) / 2;
+            panY = (viewport.clientHeight - 800 * scale) / 2;
+            updateTransform();
+        }
+
+        function keepWithinBounds() {
+            const maxW = 1200 * scale;
+            const maxH = 800 * scale;
+            const limitW = viewport.clientWidth;
+            const limitH = viewport.clientHeight;
+
+            if (panX > limitW - 100) panX = limitW - 100;
+            if (panX < -maxW + 100) panX = -maxW + 100;
+            if (panY > limitH - 100) panY = limitH - 100;
+            if (panY < -maxH + 100) panY = -maxH + 100;
+        }
+
+        // 鼠标按下/拖拽地图
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            isDragging = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+            viewport.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            keepWithinBounds();
+            updateTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            viewport.style.cursor = 'grab';
+        });
+
+        // 触摸屏拖拽控制
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - panX;
+                startY = e.touches[0].clientY - panY;
+            }
+        });
+
+        viewport.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            panX = e.touches[0].clientX - startX;
+            panY = e.touches[0].clientY - startY;
+            keepWithinBounds();
+            updateTransform();
+        });
+
+        viewport.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // 鼠标滚轮缩放
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = viewport.getBoundingClientRect();
+            const viewX = e.clientX - rect.left;
+            const viewY = e.clientY - rect.top;
+
+            const worldX = (viewX - panX) / scale;
+            const worldY = (viewY - panY) / scale;
+
+            const delta = e.deltaY < 0 ? 0.1 : -0.1;
+            scale = Math.min(Math.max(scale + delta, 0.45), 2.2);
+
+            panX = viewX - worldX * scale;
+            panY = viewY - worldY * scale;
+
+            keepWithinBounds();
+            updateTransform();
+        }, { passive: false });
+
+        // --- 历史纪录 (Record) & UI 刷新系统 ---
+        function updateBestTimeDisplayOnMenu() {
+            const bestTime = localStorage.getItem('hide_seek_best_time');
+            const container = document.getElementById('best-time-container');
+            const display = document.getElementById('best-time-display');
+            if (bestTime) {
+                const seconds = parseInt(bestTime);
+                const mm = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const ss = (seconds % 60).toString().padStart(2, '0');
+                display.innerText = `${mm}:${ss}`;
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // --- 特效爆发 & 浮窗通知 ---
+        function createExplosion(x, y) {
+            const container = document.getElementById('viewport-container');
+            const absX = x * scale + panX;
+            const absY = y * scale + panY;
+
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle text-lg z-50';
+                p.innerText = ['✨', '⭐', '💫', '🔴', '🟡', '🔵'][Math.floor(Math.random() * 6)];
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 40 + Math.random() * 80;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                const rot = (Math.random() - 0.5) * 360;
+
+                p.style.left = `${absX}px`;
+                p.style.top = `${absY}px`;
+                p.style.setProperty('--tw-tx', `${tx}px`);
+                p.style.setProperty('--tw-ty', `${ty}px`);
+                p.style.setProperty('--tw-tr', `${rot}deg`);
+
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 800);
+            }
+        }
+
+        function showToast(message, icon = "✨") {
+            const toast = document.getElementById('toast-notif');
+            document.getElementById('toast-icon').innerText = icon;
+            document.getElementById('toast-text').innerText = message;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2500);
+        }
+
+        function showCustomModal(title, desc, buttonText, icon = "🏆", callback = null) {
+            const modal = document.getElementById('game-modal');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-icon').innerText = icon;
+            const btn = document.getElementById('modal-btn');
+            btn.innerText = buttonText;
+            btn.onclick = () => {
+                modal.classList.add('hidden');
+                if (callback) callback();
+            };
+            modal.classList.remove('hidden');
+        }
+
+        // --- 核心游戏流程管理 ---
+        function startGame() {
+            playSound('click');
+            gameFinished = false;
+            secondsElapsed = 0;
+
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('gameplay-screen').classList.remove('hidden');
+
+            itemsData = JSON.parse(JSON.stringify(soloPredefinedItems));
+            renderSVGItems();
+            renderSidebarList();
+            startTimer();
+            updateProgressDisplay();
+            
+            setTimeout(resetZoomAndCenter, 100);
+        }
+
+        function quitToMainMenu() {
+            playSound('click');
+            clearInterval(timerInterval);
+            document.getElementById('gameplay-screen').classList.add('hidden');
+            document.getElementById('home-screen').classList.remove('hidden');
+            updateBestTimeDisplayOnMenu();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            secondsElapsed = 0;
+            document.getElementById('game-timer').innerText = '00:00';
+            timerInterval = setInterval(() => {
+                if (!gameFinished) {
+                    secondsElapsed++;
+                    const mm = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+                    const ss = (secondsElapsed % 60).toString().padStart(2, '0');
+                    document.getElementById('game-timer').innerText = `${mm}:${ss}`;
+                }
+            }, 1000);
+        }
+
+        // --- SVG 渲染与侧栏刷新 ---
+        function renderSVGItems() {
+            const container = document.getElementById('svg-items-layer');
+            container.innerHTML = ''; 
+
+            itemsData.forEach(item => {
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('id', `svg-item-${item.id}`);
+                group.setAttribute('class', 'cursor-pointer');
+                group.setAttribute('transform', `translate(${item.x}, ${item.y})`);
+
+                const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                bgCircle.setAttribute('cx', '0');
+                bgCircle.setAttribute('cy', '0');
+                bgCircle.setAttribute('r', '18');
+                bgCircle.setAttribute('fill', '#252538');
+                bgCircle.setAttribute('stroke', '#a6e3a1');
+                bgCircle.setAttribute('stroke-width', '2');
+                bgCircle.setAttribute('opacity', '0.9');
+
+                const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                textNode.setAttribute('x', '0');
+                textNode.setAttribute('y', '7');
+                textNode.setAttribute('font-size', '20');
+                textNode.setAttribute('text-anchor', 'middle');
+                textNode.textContent = item.emoji;
+
+                group.appendChild(bgCircle);
+                group.appendChild(textNode);
+
+                group.onclick = (e) => {
+                    e.stopPropagation();
+                    handleItemInteraction(item);
+                };
+
+                container.appendChild(group);
+            });
+        }
+
+        function renderSidebarList() {
+            const container = document.getElementById('targets-list');
+            container.innerHTML = '';
+
+            itemsData.forEach(item => {
+                const card = document.createElement('div');
+                card.id = `sidebar-card-${item.id}`;
+                card.className = `flex items-center gap-2.5 p-2 bg-[#252538] border border-[#313244] rounded-xl transition ${item.found ? 'opacity-30 line-through' : ''}`;
+                
+                card.innerHTML = `
+                    <span class="text-xl">${item.emoji}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs font-bold text-white truncate">${item.name}</div>
+                    </div>
+                    ${item.found ? '<i class="fa-solid fa-circle-check text-emerald-400"></i>' : ''}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function updateProgressDisplay() {
+            const total = itemsData.length;
+            const found = itemsData.filter(i => i.found).length;
+            document.getElementById('progress-text').innerText = `${found} / ${total} Found`;
+        }
+
+        // --- 核心寻找逻辑，以及历史纪录打破的比对逻辑 ---
+        function handleItemInteraction(item) {
+            if (item.found) return;
+
+            item.found = true;
+            playSound('success');
+            createExplosion(item.x, item.y);
+            showToast(`Found: ${item.name}!`, "✨");
+
+            const element = document.getElementById(`svg-item-${item.id}`);
+            if (element) {
+                element.setAttribute('display', 'none');
+            }
+
+            renderSidebarList();
+            updateProgressDisplay();
+
+            // 检查通关状态
+            const allFound = itemsData.every(i => i.found);
+            if (allFound) {
+                gameFinished = true;
+                clearInterval(timerInterval);
+                const mm = Math.floor(secondsElapsed / 60);
+                const ss = secondsElapsed % 60;
+                const timeStr = `${mm}m ${ss}s`;
+                
+                // 本地最佳记录比对
+                const previousBest = localStorage.getItem('hide_seek_best_time');
+                let isNewRecord = false;
+                
+                if (!previousBest || secondsElapsed < parseInt(previousBest)) {
+                    localStorage.setItem('hide_seek_best_time', secondsElapsed);
+                    isNewRecord = true;
+                }
+
+                const title = isNewRecord ? "🎉 NEW RECORD! 🎉" : "Congratulations!";
+                const desc = isNewRecord 
+                    ? `Incredible! You set a new personal best of ${timeStr}!` 
+                    : `You found all 30 hidden items in ${timeStr}!`;
+                const icon = isNewRecord ? "👑" : "🏆";
+                
+                showCustomModal(
+                    title, 
+                    desc, 
+                    "Back to Menu", 
+                    icon, 
+                    () => { quitToMainMenu(); }
+                );
+            }
+        }
+
+        // 初始化
+        window.onload = () => {
+            resetZoomAndCenter();
+            updateBestTimeDisplayOnMenu();
+        };
+
+        window.onresize = () => {
+            resetZoomAndCenter();
+        };
+    </script>
+</body>
+</html>

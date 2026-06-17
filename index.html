@@ -2,6 +2,111 @@
 <html lang="en">
 <head>
 
+    
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<!-- 2. 漂浮按钮的 CSS 样式（可以直接放在你原网页的 <style> 标签内） -->
+<style>
+    .pixel-heart-floating-btn {
+        /* 固定在右下角 */
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999; /* 确保在最上层 */
+        
+        /* 尺寸设定（可根据需要微调宽度） */
+        width: 80px;  
+        height: auto;
+        display: inline-block;
+        cursor: pointer;
+        text-decoration: none;
+        
+        /* 浮动与渐变过渡 */
+        animation: heartFloat 3s ease-in-out infinite;
+        transition: transform 0.2s ease-in-out, filter 0.2s;
+    }
+
+    /* 鼠标悬停：心跳缩放 + 粉色霓虹光晕 */
+    .pixel-heart-floating-btn:hover {
+        transform: scale(1.15);
+        filter: drop-shadow(0 10px 15px rgba(255, 112, 150, 0.4));
+        animation: heartFloat 1.5s ease-in-out infinite, heartBeat 0.6s infinite alternate;
+    }
+
+    /* 鼠标点击微缩反馈 */
+    .pixel-heart-floating-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* 缓慢上下漂浮动画 */
+    @keyframes heartFloat {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-8px);
+        }
+    }
+
+    /* 像素心跳动画 */
+    @keyframes heartBeat {
+        to {
+            transform: scale(1.08);
+        }
+    }
+</style>
+
+<!-- 3. 漂浮按钮 HTML（贴在你原网页的 <body> 结束标签前即可） -->
+<a href="hideandseekgame.html" class="pixel-heart-floating-btn" title="点击开始游戏！">
+    <svg viewBox="0 0 150 130" xmlns="http://www.w3.org/2000/svg" style="image-rendering: pixelated; width: 100%; height: auto;">
+        <!-- 像素爱心深粉色外边框 -->
+        <rect x="20" y="10" width="30" height="10" fill="#ff7096" />
+        <rect x="10" y="20" width="10" height="30" fill="#ff7096" />
+        <rect x="100" y="10" width="30" height="10" fill="#ff7096" />
+        <rect x="130" y="20" width="10" height="30" fill="#ff7096" />
+        <rect x="70" y="20" width="10" height="10" fill="#ff7096" />
+        <rect x="50" y="20" width="20" height="10" fill="#ff7096" />
+        <rect x="80" y="20" width="20" height="10" fill="#ff7096" />
+        <rect x="0" y="30" width="10" height="30" fill="#ff7096" />
+        <rect x="140" y="30" width="10" height="30" fill="#ff7096" />
+        <rect x="10" y="60" width="10" height="10" fill="#ff7096" />
+        <rect x="130" y="60" width="10" height="10" fill="#ff7096" />
+        <rect x="20" y="70" width="10" height="10" fill="#ff7096" />
+        <rect x="120" y="70" width="10" height="10" fill="#ff7096" />
+        <rect x="30" y="80" width="10" height="10" fill="#ff7096" />
+        <rect x="110" y="80" width="10" height="10" fill="#ff7096" />
+        <rect x="40" y="90" width="10" height="10" fill="#ff7096" />
+        <rect x="100" y="90" width="10" height="10" fill="#ff7096" />
+        <rect x="50" y="100" width="10" height="10" fill="#ff7096" />
+        <rect x="90" y="100" width="10" height="10" fill="#ff7096" />
+        <rect x="60" y="110" width="10" height="10" fill="#ff7096" />
+        <rect x="80" y="110" width="10" height="10" fill="#ff7096" />
+        <rect x="70" y="120" width="10" height="10" fill="#ff7096" />
+
+        <!-- 像素爱心浅粉色填充 -->
+        <path d="M 20,20 h 30 v 10 h 50 v -10 h 30 v 10 h 10 v 30 h -10 v 10 h -10 v 10 h -10 v 10 h -10 v 10 h -10 v 10 h -10 v -10 h -10 v -10 h -10 v -10 h -10 v -10 h -10 v -10 h -10 v -30 h 10 z" fill="#ffccd5" />
+        
+        <!-- 像素高光 -->
+        <rect x="20" y="20" width="10" height="10" fill="#fff0f3" />
+        <rect x="30" y="20" width="10" height="10" fill="#fff0f3" />
+        <rect x="20" y="30" width="10" height="10" fill="#fff0f3" />
+        <rect x="100" y="20" width="10" height="10" fill="#fff0f3" />
+
+        <!-- GAME 像素文本 -->
+        <text x="75" y="73" 
+              font-family="'Press Start 2P', monospace" 
+              font-size="14" 
+              fill="#ff477e" 
+              font-weight="bold" 
+              text-anchor="middle" 
+              letter-spacing="1">GAME</text>
+    </svg>
+</a>
+
+
+
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -581,7 +686,7 @@ function closeImage() {
 
 
 
-<a href="../index.html" class="floating-btn">Back</a>
+<a href="hideandseekgame.html" class="pixel-heart-floating-btn" ...></a>
 
 </body>
 </html>
